@@ -11,12 +11,16 @@ import (
 	"os"
 )
 
-// These variables are later read from procs file.
+// These variables are later read from procs file (for 1r of 1a file)
+// or acqus file (for fid file)
 
 const ABSF1 float64 = 16.39466
 const ABSF2 float64 = -4.090485
 const FTSIZE int = 65536
 const SF float64 = 400.13000916893
+
+// DTYPP or DTYPA in these files.
+const DTYPE = 0
 
 // read file from directory and return an array.
 func readfile(dir string) ([]float64, []float64) {
@@ -64,11 +68,14 @@ func drawPlot() {
 	p.X.Label.Text = "Chemical Shift (ppm)"
 	p.Y.Label.Text = "Strength"
 	line, err := plotter.NewLine(generatePoints())
-	line.LineStyle.Color = color.Black
-	p.Add(line)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	line.LineStyle.Color = color.Black
+	p.Add(line)
+	p.X.Scale = plot.InvertedScale{Normalizer: p.X.Scale}
+
 	err = p.Save(800, 800, "graph.png")
 	if err != nil {
 		fmt.Println(err)
