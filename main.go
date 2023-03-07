@@ -9,21 +9,62 @@ import (
 	"image/color"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 )
 
 // These variables are later read from procs file (for 1r of 1a file)
 // or acqus file (for fid file)
 
-const ABSF1 float64 = 16.39466
-const ABSF2 float64 = -4.090485
-const FTSIZE int = 65536
-const SF float64 = 400.13000916893
+var ABSF1 float64
+
+var ABSF2 float64
+var FTSIZE int
+var SF float64
 
 // DTYPP or DTYPA in these files.
-const DTYPE = 0
+var DTYPE int
+
+func readconfig(dir string) {
+	f, err := os.Open(dir)
+	if err != nil {
+		fmt.Println(err)
+	}
+	scanner := bufio.NewScanner(f)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		line := scanner.Text()
+		items := strings.Split(line, " ")
+		if err != nil {
+			print(err)
+		}
+		switch items[0] {
+		case "##$ABSF1=":
+			value, err := strconv.ParseFloat(items[1], 64)
+			ABSF1 = value
+		case "##$ABSF2=":
+			value, err := strconv.ParseFloat(items[1], 64)
+			ABSF2 = value
+		case "##$FTSIZE=":
+			value, err := strconv.ParseFloat(items[1], 64)
+			FTSIZE = int(value)
+		case "##$SF=":
+			value, err := strconv.ParseFloat(items[1], 64)
+			SF = value
+		case "##$DTYPP=":
+			value, err := strconv.ParseFloat(items[1], 64)
+			DTYPE = int(value)
+		}
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+}
 
 // read file from directory and return an array.
 func readfile(dir string) ([]float64, []float64) {
+	readconfig("procs")
 	f, err := os.Open(dir)
 	if err != nil {
 		fmt.Println(err)
