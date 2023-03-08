@@ -16,16 +16,15 @@ import (
 // These variables are later read from procs file (for 1r of 1a file)
 // or acqus file (for fid file)
 
-var ABSF1 float64
+var (
+	ABSF2  float64
+	ABSF1  float64
+	FTSIZE int
+	SF     int
+	DTYPE  int
+)
 
-var ABSF2 float64
-var FTSIZE int
-var SF float64
-
-// DTYPP or DTYPA in these files.
-var DTYPE int
-
-func readconfig(dir string) {
+func readconfig(dir string, ABSF1 *float64, ABSF2 *float64, FTSIZE *int, SF *int, DTYPE *int) {
 	f, err := os.Open(dir)
 	if err != nil {
 		fmt.Println(err)
@@ -38,34 +37,31 @@ func readconfig(dir string) {
 		if err != nil {
 			print(err)
 		}
-		var value string
 		if len(items) == 2 {
 			switch items[0] {
 			case "##$ABSF1=":
 				value, _ := strconv.ParseFloat(items[1], 64)
-				ABSF1 = value
+				*ABSF1 = value
 			case "##$ABSF2=":
 				value, _ := strconv.ParseFloat(items[1], 64)
-				ABSF2 = value
+				*ABSF2 = value
 			case "##$FTSIZE=":
-				value, _ := strconv.ParseFloat(items[1], 64)
-				FTSIZE = int(value)
+				value, _ := strconv.ParseInt(items[1], 0, 32)
+				*FTSIZE = int(value)
 			case "##$SF=":
-				value, _ := strconv.ParseFloat(items[1], 64)
-				SF = value
+				value, _ := strconv.ParseInt(items[1], 0, 32)
+				*SF = int(value)
 			case "##$DTYPP=":
-				value, _ := strconv.ParseFloat(items[1], 64)
-				DTYPE = int(value)
+				value, _ := strconv.ParseInt(items[1], 0, 32)
+				*DTYPE = int(value)
 			}
-			fmt.Println(value)
 		}
 	}
-
 }
 
 // read file from directory and return an array.
 func readfile(dir string) ([]float64, []float64) {
-	readconfig("procs")
+	readconfig("procs", &ABSF1, &ABSF2, &FTSIZE, &SF, &DTYPE)
 	f, err := os.Open(dir)
 	if err != nil {
 		fmt.Println(err)
@@ -94,8 +90,9 @@ func readfile(dir string) ([]float64, []float64) {
 }
 
 func generatePoints() plotter.XYs {
-	points := make(plotter.XYs, FTSIZE)
 	xaxis, yaxis := readfile("1r")
+	points := make(plotter.XYs, FTSIZE)
+	fmt.Println(len(points))
 	for i := 0; i < FTSIZE; i++ {
 		points[i].X = xaxis[i]
 		points[i].Y = yaxis[i]
@@ -104,7 +101,6 @@ func generatePoints() plotter.XYs {
 }
 
 func drawPlot() {
-	//fmt.Println(xaxis)
 	p := plot.New()
 	p.Title.Text = "NMRViewer"
 	p.X.Label.Text = "Chemical Shift (ppm)"
