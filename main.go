@@ -38,25 +38,26 @@ func readconfig(dir string) {
 		if err != nil {
 			print(err)
 		}
-		switch items[0] {
-		case "##$ABSF1=":
-			value, err := strconv.ParseFloat(items[1], 64)
-			ABSF1 = value
-		case "##$ABSF2=":
-			value, err := strconv.ParseFloat(items[1], 64)
-			ABSF2 = value
-		case "##$FTSIZE=":
-			value, err := strconv.ParseFloat(items[1], 64)
-			FTSIZE = int(value)
-		case "##$SF=":
-			value, err := strconv.ParseFloat(items[1], 64)
-			SF = value
-		case "##$DTYPP=":
-			value, err := strconv.ParseFloat(items[1], 64)
-			DTYPE = int(value)
-		}
-		if err != nil {
-			fmt.Println(err)
+		var value string
+		if len(items) == 2 {
+			switch items[0] {
+			case "##$ABSF1=":
+				value, _ := strconv.ParseFloat(items[1], 64)
+				ABSF1 = value
+			case "##$ABSF2=":
+				value, _ := strconv.ParseFloat(items[1], 64)
+				ABSF2 = value
+			case "##$FTSIZE=":
+				value, _ := strconv.ParseFloat(items[1], 64)
+				FTSIZE = int(value)
+			case "##$SF=":
+				value, _ := strconv.ParseFloat(items[1], 64)
+				SF = value
+			case "##$DTYPP=":
+				value, _ := strconv.ParseFloat(items[1], 64)
+				DTYPE = int(value)
+			}
+			fmt.Println(value)
 		}
 	}
 
@@ -94,7 +95,7 @@ func readfile(dir string) ([]float64, []float64) {
 
 func generatePoints() plotter.XYs {
 	points := make(plotter.XYs, FTSIZE)
-	xaxis, yaxis := readfile("./1r")
+	xaxis, yaxis := readfile("1r")
 	for i := 0; i < FTSIZE; i++ {
 		points[i].X = xaxis[i]
 		points[i].Y = yaxis[i]
