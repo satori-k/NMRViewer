@@ -100,7 +100,7 @@ func generatePoints() plotter.XYs {
 	return points
 }
 
-func drawPlot() {
+func drawPlot(min float64, max float64) {
 	p := plot.New()
 	p.Title.Text = "NMRViewer"
 	p.X.Label.Text = "Chemical Shift (ppm)"
@@ -112,13 +112,19 @@ func drawPlot() {
 
 	line.LineStyle.Color = color.Black
 	p.Add(line)
+	// invert the x-axis
 	p.X.Scale = plot.InvertedScale{Normalizer: p.X.Scale}
-
+	p.X.Min = min
+	p.X.Max = max
 	err = p.Save(800, 800, "graph.png")
 	if err != nil {
 		fmt.Println(err)
 	}
 }
+
 func main() {
-	drawPlot()
+	// default range, the largest
+	//drawPlot(ABSF1, ABSF2)
+	// zoom in for detail
+	drawPlot(-1.0, 7.0)
 }
